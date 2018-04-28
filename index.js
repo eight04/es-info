@@ -72,7 +72,10 @@ function analyze(ast, {dynamicImport = false} = {}) {
         }
       }
       if (node.declaration) {
-        if (node.declaration.type === "FunctionDeclaration") {
+        if (
+          node.declaration.type === "FunctionDeclaration" ||
+          node.declaration.type === "ClassDeclaration"
+        ) {
           result.export.named.push(node.declaration.id.name);
         } else if (node.declaration.type === "VariableDeclaration") {
           for (const va of node.declaration.declarations) {

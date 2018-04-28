@@ -1,0 +1,9 @@
+{
+  "import": {},
+  "export": {
+    "default": false,
+    "named": ["foo"],
+    "all": false
+  },
+  "dynamicImport": []
+}
