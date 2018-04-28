@@ -7,10 +7,10 @@ Usage
 -----
 
 ```js
-const {parse} = require("acorn-dynamic-import").default;
+const {default: acorn} = require("acorn-dynamic-import");
 const {analyze} = require("cjs-es");
 
-const ast = parse(`
+const code = `
 import foo from "foo";
 import {bar} from "bar";
 import * as baz from "baz";
@@ -23,8 +23,14 @@ if (foo === "doSomething") {
   import("dynamic-imported")
     .then(module => module.doSomething());
 }
-`);
+`;
 
+const ast = acorn.parse(code, {
+  sourceType: "module",
+  plugins: {
+    dynamicImport: true
+  }
+});
 const result = analyze(ast, {dynamicImport: true});
 ```
 
