@@ -1,0 +1,30 @@
+{
+  "import": {
+    "foo": {
+      "default": true,
+      "named": [],
+      "all": false
+    },
+    "bar": {
+      "default": false,
+      "named": ["bar"],
+      "all": false
+    },
+    "baz": {
+      "default": false,
+      "named": [],
+      "all": true
+    },
+    "bla": {
+      "default": false,
+      "named": ["bla"],
+      "all": false
+    }
+  },
+  "export": {
+    "default": true,
+    "named": ["boo", "bla"],
+    "all": false
+  },
+  "dynamicImport": ["dynamic-imported"]
+}
