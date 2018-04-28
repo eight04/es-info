@@ -11,9 +11,7 @@
     "analyze"
   ],
   "main": "index.js",
-  "files": [
-    "lib"
-  ],
+  "files": [],
   "scripts": {
     "test": "eslint **/*.js && mocha",
     "preversion": "npm test",
