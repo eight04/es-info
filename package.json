@@ -21,11 +21,12 @@
   "author": "eight04 <eight04@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "acorn-dynamic-import": "^3.0.0",
-    "eslint": "^4.19.1",
-    "mocha": "^5.1.1"
+    "acorn": "^6.1.1",
+    "acorn-dynamic-import": "^4.0.0",
+    "eslint": "^5.16.0",
+    "mocha": "^6.1.4"
   },
   "dependencies": {
-    "estree-walker": "^0.5.1"
+    "estree-walker": "^0.6.1"
   }
 }

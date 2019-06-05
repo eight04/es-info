@@ -1,8 +1,14 @@
 /* eslint-env mocha */
 const assert = require("assert");
 const fs = require("fs");
-const {default: acorn} = require("acorn-dynamic-import");
+const {Parser: AcornParser} = require("acorn");
+const {default: dynamicImport} = require("acorn-dynamic-import");
 const {analyze} = require("..");
+
+const parseCode = (() => {
+  const Parser = AcornParser.extend(dynamicImport);
+  return code => Parser.parse(code, {sourceType: "module"});
+})();
 
 describe("cases", () => {
   for (const dir of fs.readdirSync(__dirname + "/cases")) {
@@ -22,12 +28,7 @@ describe("cases", () => {
       const error = readFile("error.json");
       const input = readFile("input.js");
       const output = readFile("output.json");
-      const ast = acorn.parse(input, {
-        sourceType: "module",
-        plugins: {
-          dynamicImport: true
-        }
-      });
+      const ast = parseCode(input);
       
       let result, err;
       try {
