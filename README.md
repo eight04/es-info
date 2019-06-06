@@ -1,6 +1,8 @@
 es-info
 =======
 
+[![Build Status](https://travis-ci.com/eight04/es-info.svg?branch=master)](https://travis-ci.com/eight04/es-info)
+
 Analyze ES module and extract information about imports, exports, and dynamic imports.
 
 Usage
