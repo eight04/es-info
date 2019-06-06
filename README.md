@@ -2,6 +2,7 @@ es-info
 =======
 
 [![Build Status](https://travis-ci.com/eight04/es-info.svg?branch=master)](https://travis-ci.com/eight04/es-info)
+[![codecov](https://codecov.io/gh/eight04/es-info/branch/master/graph/badge.svg)](https://codecov.io/gh/eight04/es-info)
 
 Analyze ES module and extract information about imports, exports, and dynamic imports.
 
