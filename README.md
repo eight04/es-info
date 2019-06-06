@@ -133,7 +133,7 @@ If `exportInfo.all` is true then the module exports all members from another mod
 Changelog
 ---------
 
-* 0.2.0 (Next)
+* 0.2.0 (Jun 6, 2019)
 
   - **Breaking: drop `options.dynamicImport`. Now the module always analyze the entire tree.**
   - Add: `importInfo.used`. Use it to check which names are used.
