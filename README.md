@@ -104,15 +104,15 @@ const importInfo = {
 
 If `importInfo.default` is true then the default member is imported from the module.
 
-`importInfo.named` contains a list of imported name. 
+`importInfo.named` contains a list of imported names.
 
 If `importInfo.all` is true then all names are imported from the module (`import * from ...`).
 
-`importInfo.used` is an array of imported name. If a name is included in this array, then it is referenced somewhere. You can check which names are actually used when `importInfo.all === true` by checking this array.
+`importInfo.used` is an array of imported names. If a name is included in this array, then it is referenced somewhere in the code. You can use this array to determine which names are actually used when `importInfo.all` is true.
 
 Note that `export {foo} from "bar"` doesn't *use* `foo`.
 
-`exportInfo` has following shape:
+`exportInfo` has the following shape:
 
 ```js
 const exportInfo = {
@@ -122,11 +122,11 @@ const exportInfo = {
 };
 ```
 
-If `exportInfo.default` is true then the module has default export.
+If `exportInfo.default` is true then the module exports a default member.
 
 `exportInfo.named` is a list of exported names.
 
-If `exportInfo.all` is true then the module exports all members from another import e.g. `export * from "foo"`.
+If `exportInfo.all` is true then the module exports all members from another module e.g. `export * from "foo"`.
 
 `dynamicImport` is a list of module ID which are imported with dynamic `import()` statement.
 
