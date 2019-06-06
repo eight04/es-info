@@ -7,8 +7,11 @@ Usage
 -----
 
 ```js
-const {default: acorn} = require("acorn-dynamic-import");
-const {analyze} = require("cjs-es");
+const {Parser} = require("acorn");
+const {default: dynamicImport} = require("acorn-dynamic-import");
+const {analyze} = require("es-info");
+
+const DynamicImportParser = Parser.extend(dynamicImport);
 
 const code = `
 import foo from "foo";
@@ -24,14 +27,9 @@ if (foo === "doSomething") {
     .then(module => module.doSomething());
 }
 `;
+const ast = DynamicImportParser.parse(code, {sourceType: "module"});
 
-const ast = acorn.parse(code, {
-  sourceType: "module",
-  plugins: {
-    dynamicImport: true
-  }
-});
-const result = analyze(ast, {dynamicImport: true});
+const result = analyze(ast);
 ```
 
 Result:
@@ -42,22 +40,26 @@ Result:
     foo: {
       default: true,
       named: [],
-      all: false
+      all: false,
+      used: ["default"]
     },
     bar: {
       default: false,
       named: ["bar"],
-      all: false
+      all: false,
+      used: []
     },
     baz: {
       default: false,
-      named: []
-      all: true
+      named: [],
+      all: true,
+      used: []
     },
     bla: {
       default: false,
       named: ["bla"],
-      all: false
+      all: false,
+      used: []
     }
   },
   export: {
@@ -76,30 +78,62 @@ This module exports following members.
 
 * `analyze`: A function which can analyze an AST and extract imports, exports information.
 
-### analyze(ast, options: object): Result object
+### analyze
 
-`options` has following members:
+```js
+const analyzeResult: {
+  import: Object<moduleId : importInfo>,
+  export: exportInfo,
+  dynamicImport: Array<String>
+} = analyze(ast);
+```
 
-* `dynamicImport`: `boolean`. If true then collect dynamic import information. Note that it has to analyze entire AST instead of top-level import/export declarations.
+`import` is an object map. The key is the module ID and the value is an info object with these members:
 
-The result object has following properties:
+```js
+const importInfo = {
+  default: Boolean,
+  named: Array<String>,
+  all: Boolean,
+  used: Array<String>
+};
+```
 
-* `import`: An object map. The key is the module ID and the value is an object with these members:
+If `importInfo.default` is true then the default member is imported from the module.
 
-  - `default`: `boolean`. If true then the default member is imported from the module.
-  - `named`: `Array<string>`. A list of name that is imported from the module.
-  - `all`: `boolean`. If true then all names are imported from the module.
-  
-* `export`: `object`. It has following keys:
+`importInfo.named` contains a list of imported name. 
 
-  - `default`: `boolean`. If true then the module has default export.
-  - `named`: `Array<string>`. A list of named export.
-  - `all`: `boolean`. If true then the module exports all members from another import e.g. `export * from "foo"`.
-  
-* `dynamicImport`: `Array<string>`. A list of module ID which is imported with dynamic `import()` statement.
+If `importInfo.all` is true then all names are imported from the module (`import * from ...`).
+
+`importInfo.used` is an array of imported name. If a name is included in this array, then it is referenced somewhere. You can check which names are actually used when `importInfo.all === true` by checking this array.
+
+Note that `export {foo} from "bar"` doesn't *use* `foo`.
+
+`exportInfo` has following shape:
+
+```js
+const exportInfo = {
+  default: Boolean,
+  named: Array<String>,
+  all: Boolean
+};
+```
+
+If `exportInfo.default` is true then the module has default export.
+
+`exportInfo.named` is a list of exported names.
+
+If `exportInfo.all` is true then the module exports all members from another import e.g. `export * from "foo"`.
+
+`dynamicImport` is a list of module ID which are imported with dynamic `import()` statement.
 
 Changelog
 ---------
+
+* 0.2.0 (Next)
+
+  - **Breaking: drop `options.dynamicImport`. Now the module always analyze the entire tree.**
+  - Add: `importInfo.used`. Use it to check which names are used.
 
 * 0.1.1 (Apr 29, 2018)
 
