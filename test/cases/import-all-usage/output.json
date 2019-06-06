@@ -1,0 +1,16 @@
+{
+  "import": {
+    "bar": {
+      "default": false,
+      "named": [],
+      "all": true,
+      "used": ["baz"]
+    }
+  },
+  "export": {
+    "default": false,
+    "named": [],
+    "all": false
+  },
+  "dynamicImport": []
+}

@@ -1,0 +1,16 @@
+{
+  "import": {
+    "foo": {
+      "default": true,
+      "named": [],
+      "all": false,
+      "used": []
+    }
+  },
+  "export": {
+    "default": true,
+    "named": [],
+    "all": false
+  },
+  "dynamicImport": []
+}

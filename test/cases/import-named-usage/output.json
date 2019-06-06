@@ -1,0 +1,16 @@
+{
+  "import": {
+    "bar": {
+      "default": false,
+      "named": ["foo"],
+      "all": false,
+      "used": ["foo"]
+    }
+  },
+  "export": {
+    "default": false,
+    "named": [],
+    "all": false
+  },
+  "dynamicImport": []
+}
