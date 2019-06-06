@@ -7,7 +7,7 @@ class ParseError extends Error {
   }
 }
 
-function analyze(ast, {dynamicImport = false} = {}) {
+function analyze(ast) {
   const result = {
     import: {},
     export: {
@@ -18,15 +18,9 @@ function analyze(ast, {dynamicImport = false} = {}) {
     dynamicImport: []
   };
   
-  if (!dynamicImport) {
-    for (const node of ast.body) {
-      analyzeNode(node);
-    }
-  } else {
-    walk(ast, {
-      enter: analyzeNode
-    });
-  }
+  walk(ast, {
+    enter: analyzeNode
+  });
   
   function getImported(id) {
     return result.import[id] ?
