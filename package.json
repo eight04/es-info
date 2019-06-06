@@ -1,6 +1,6 @@
 {
   "name": "es-info",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Analyze ES module and extract information about imports, exports, and dynamic imports.",
   "keywords": [
     "es",
