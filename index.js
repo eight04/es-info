@@ -20,7 +20,7 @@ function analyze(ast) {
     dynamicImport: []
   };
   
-  ast.scope = attachScopes(ast, "scope");
+  ast._esInfoScope = attachScopes(ast, "_esInfoScope");
   
   const importRefs = new Map;
   
@@ -44,8 +44,8 @@ function analyze(ast) {
       this.skip();
       return;
     }
-    if (!node.scope && parent) {
-      node.scope = parent.scope;
+    if (!node._esInfoScope && parent) {
+      node._esInfoScope = parent._esInfoScope;
     }
     if (node.type === "ImportDeclaration") {
       const id = node.source.value;
@@ -110,7 +110,7 @@ function analyze(ast) {
         result.dynamicImport.push(node.arguments[0].value);
       }
     } else if (node.type === "Identifier" && isReference(node, parent)) {
-      if (!node.scope.contains(node.name) && importRefs.has(node.name)) {
+      if (!node._esInfoScope.contains(node.name) && importRefs.has(node.name)) {
         let {id, name} = importRefs.get(node.name);
         if (!name && parent.type === "MemberExpression") {
           name = parent.property.name;
