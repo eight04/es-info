@@ -133,6 +133,10 @@ If `exportInfo.all` is true then the module exports all members from another mod
 Changelog
 ---------
 
+* 0.2.1 (Jun 6, 2019)
+
+  - Fix: rename `.scope` to `._esInfoScope` to avoid the conflict.
+
 * 0.2.0 (Jun 6, 2019)
 
   - **Breaking: drop `options.dynamicImport`. Now the module always analyze the entire tree.**
