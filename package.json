@@ -28,6 +28,8 @@
     "mocha": "^6.1.4"
   },
   "dependencies": {
-    "estree-walker": "^0.6.1"
+    "estree-walker": "^0.6.1",
+    "is-reference": "^1.1.2",
+    "rollup-pluginutils": "^2.8.1"
   }
 }

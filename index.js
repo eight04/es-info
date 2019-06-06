@@ -1,4 +1,6 @@
 const {walk} = require("estree-walker");
+const {attachScopes} = require("rollup-pluginutils");
+const isReference = require("is-reference");
 
 class ParseError extends Error {
   constructor(message, node) {
@@ -18,6 +20,10 @@ function analyze(ast) {
     dynamicImport: []
   };
   
+  ast.scope = attachScopes(ast, "scope");
+  
+  const importRefs = new Map;
+  
   walk(ast, {
     enter: analyzeNode
   });
@@ -28,28 +34,42 @@ function analyze(ast) {
       (result.import[id] = {
         named: [],
         default: false,
-        all: false
+        all: false,
+        used: []
       });
   }
   
-  function analyzeNode(node) {
+  function analyzeNode(node, parent) {
+    if (node._esInfoSkip) {
+      this.skip();
+      return;
+    }
+    if (!node.scope && parent) {
+      node.scope = parent.scope;
+    }
     if (node.type === "ImportDeclaration") {
-      const imported = getImported(node.source.value);
+      const id = node.source.value;
+      const imported = getImported(id);
       for (const spec of node.specifiers) {
         if (spec.type === "ImportSpecifier") {
           imported.named.push(spec.imported.name);
+          importRefs.set(spec.local.name, {id, name: spec.imported.name});
         } else if (spec.type === "ImportDefaultSpecifier") {
           imported.default = true;
+          importRefs.set(spec.local.name, {id, name: "default"});
         } else if (spec.type === "ImportNamespaceSpecifier") {
           imported.all = true;
+          importRefs.set(spec.local.name, {id, name: null});
         } else {
           throw new ParseError(`Unknown node type ${spec.type}`, spec);
         }
+        spec.local._esInfoSkip = true;
       }
     } else if (node.type === "ExportNamedDeclaration") {
       // check import
       if (node.source) {
-        const imported = getImported(node.source.value);
+        const id = node.source.value;
+        const imported = getImported(id);
         for (const spec of node.specifiers) {
           if (spec.local.name === "default") {
             imported.default = true;
@@ -85,9 +105,19 @@ function analyze(ast) {
       result.export.all = true;
       const imported = getImported(node.source.value);
       imported.all = true;
-    } else if (dynamicImport && node.type === "CallExpression") {
+    } else if (node.type === "CallExpression") {
       if (node.callee.type === "Import") {
         result.dynamicImport.push(node.arguments[0].value);
+      }
+    } else if (node.type === "Identifier" && isReference(node, parent)) {
+      if (!node.scope.contains(node.name) && importRefs.has(node.name)) {
+        let {id, name} = importRefs.get(node.name);
+        if (!name && parent.type === "MemberExpression") {
+          name = parent.property.name;
+        }
+        if (name && !result.import[id].used.includes(name)) {
+          result.import[id].used.push(name);
+        }
       }
     }
   }

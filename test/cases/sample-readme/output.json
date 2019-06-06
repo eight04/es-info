@@ -3,22 +3,26 @@
     "foo": {
       "default": true,
       "named": [],
-      "all": false
+      "all": false,
+      "used": ["default"]
     },
     "bar": {
       "default": false,
       "named": ["bar"],
-      "all": false
+      "all": false,
+      "used": []
     },
     "baz": {
       "default": false,
       "named": [],
-      "all": true
+      "all": true,
+      "used": []
     },
     "bla": {
       "default": false,
       "named": ["bla"],
-      "all": false
+      "all": false,
+      "used": []
     }
   },
   "export": {
