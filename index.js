@@ -9,7 +9,7 @@ class ParseError extends Error {
   }
 }
 
-function analyze(ast) {
+function analyze({ast, subtree = false}) {
   const result = {
     import: {},
     export: {
@@ -20,7 +20,9 @@ function analyze(ast) {
     dynamicImport: []
   };
   
-  ast._esInfoScope = attachScopes(ast, "_esInfoScope");
+  if (subtree) {
+    ast._esInfoScope = attachScopes(ast, "_esInfoScope");
+  }
   
   const importRefs = new Map;
   
@@ -44,7 +46,7 @@ function analyze(ast) {
       this.skip();
       return;
     }
-    if (!node._esInfoScope && parent) {
+    if (!node._esInfoScope && parent && parent._esInfoScope) {
       node._esInfoScope = parent._esInfoScope;
     }
     if (node.type === "ImportDeclaration") {
@@ -109,7 +111,7 @@ function analyze(ast) {
       if (node.callee.type === "Import") {
         result.dynamicImport.push(node.arguments[0].value);
       }
-    } else if (node.type === "Identifier" && isReference(node, parent)) {
+    } else if (node.type === "Identifier" && isReference(node, parent) && node._esInfoScope) {
       if (!node._esInfoScope.contains(node.name) && importRefs.has(node.name)) {
         let {id, name} = importRefs.get(node.name);
         if (!name && parent.type === "MemberExpression") {
@@ -119,6 +121,9 @@ function analyze(ast) {
           result.import[id].used.push(name);
         }
       }
+    }
+    if (!subtree && node.type !== "Program") {
+      this.skip();
     }
   }
   

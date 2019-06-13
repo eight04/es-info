@@ -32,7 +32,7 @@ if (foo === "doSomething") {
 `;
 const ast = DynamicImportParser.parse(code, {sourceType: "module"});
 
-const result = analyze(ast);
+const result = analyze({ast, subtree: true});
 ```
 
 Result:
@@ -88,10 +88,21 @@ const analyzeResult: {
   import: Object<moduleId : importInfo>,
   export: exportInfo,
   dynamicImport: Array<String>
-} = analyze(ast);
+} = analyze({
+  ast,
+  subtree?: Boolean
+});
 ```
 
-`import` is an object map. The key is the module ID and the value is an info object with these members:
+#### options
+
+`ast` is an estree object.
+
+If `subtree` is `true`, the analyzer will analyze the entire tree, otherwise only the top nodes (import/export declarations) are analyzed. **You have to set `subtree` to `true` if you want to collect the usage of imported names and to collect dynamic imports**. Default: `false`.
+
+#### analyzeResult
+
+`import` is an object map. The key is the module ID and the value is an information object with these properties:
 
 ```js
 const importInfo = {
@@ -112,7 +123,7 @@ If `importInfo.all` is true then all names are imported from the module (`import
 
 Note that `export {foo} from "bar"` doesn't *use* `foo`.
 
-`exportInfo` has the following shape:
+`exportInfo` has following properties:
 
 ```js
 const exportInfo = {

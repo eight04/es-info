@@ -24,7 +24,7 @@ describe("cases", () => {
           // pass
         }
       };
-      const options = readFile("options.json") || {};
+      const options = readFile("options.json");
       const error = readFile("error.json");
       const input = readFile("input.js");
       const output = readFile("output.json");
@@ -32,7 +32,7 @@ describe("cases", () => {
       
       let result, err;
       try {
-        result = analyze(ast, Object.assign({dynamicImport: true}, options));
+        result = analyze({ast, ...options});
       } catch (_err) {
         if (!error) {
           throw _err;
