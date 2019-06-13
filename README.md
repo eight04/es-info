@@ -144,6 +144,11 @@ If `exportInfo.all` is true then the module exports all members from another mod
 Changelog
 ---------
 
+* 0.3.0 (Jun 13, 2019)
+
+  - **Breaking: the signature of `analyze()` is changed.**
+  - Add: `subtree` option.
+
 * 0.2.1 (Jun 6, 2019)
 
   - Fix: rename `.scope` to `._esInfoScope` to avoid the conflict.
