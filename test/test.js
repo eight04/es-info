@@ -2,17 +2,15 @@
 const assert = require("assert");
 const fs = require("fs");
 const {Parser: AcornParser} = require("acorn");
-const {default: dynamicImport} = require("acorn-dynamic-import");
 const {analyze} = require("..");
 
 const parseCode = (() => {
-  const Parser = AcornParser.extend(dynamicImport);
-  return code => Parser.parse(code, {sourceType: "module"});
+  return code => AcornParser.parse(code, {sourceType: "module", ecmaVersion: 2022});
 })();
 
 describe("cases", () => {
   for (const dir of fs.readdirSync(__dirname + "/cases")) {
-    it(dir, () => {
+    it(dir, async () => {
       const readFile = filename => {
         try {
           const content = fs.readFileSync(`${__dirname}/cases/${dir}/${filename}`, "utf8").replace(/\r/g, "");
@@ -32,7 +30,7 @@ describe("cases", () => {
       
       let result, err;
       try {
-        result = analyze({ast, ...options});
+        result = await analyze({ast, ...options});
       } catch (_err) {
         if (!error) {
           throw _err;
