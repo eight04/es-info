@@ -17,7 +17,7 @@
     "preversion": "npm test",
     "postversion": "git push --follow-tags && npm publish"
   },
-  "repository": "eight04/cjs-es",
+  "repository": "eight04/es-info",
   "author": "eight04 <eight04@gmail.com>",
   "license": "MIT",
   "devDependencies": {
