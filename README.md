@@ -1,7 +1,7 @@
 es-info
 =======
 
-[![Build Status](https://travis-ci.com/eight04/es-info.svg?branch=master)](https://travis-ci.com/eight04/es-info)
+[![.github/workflows/build.yml](https://github.com/eight04/es-info/actions/workflows/build.yml/badge.svg)](https://github.com/eight04/es-info/actions/workflows/build.yml)
 [![codecov](https://codecov.io/gh/eight04/es-info/branch/master/graph/badge.svg)](https://codecov.io/gh/eight04/es-info)
 
 Analyze ES module and extract information about imports, exports, and dynamic imports.
@@ -11,10 +11,7 @@ Usage
 
 ```js
 const {Parser} = require("acorn");
-const {default: dynamicImport} = require("acorn-dynamic-import");
 const {analyze} = require("es-info");
-
-const DynamicImportParser = Parser.extend(dynamicImport);
 
 const code = `
 import foo from "foo";
@@ -30,9 +27,9 @@ if (foo === "doSomething") {
     .then(module => module.doSomething());
 }
 `;
-const ast = DynamicImportParser.parse(code, {sourceType: "module"});
+const ast = Parser.parse(code, {sourceType: "module", ecmaVersion: 2022});
 
-const result = analyze({ast, subtree: true});
+const result = await analyze({ast, subtree: true});
 ```
 
 Result:
@@ -83,66 +80,61 @@ This module exports following members.
 
 ### analyze
 
-```js
-const analyzeResult: {
-  import: Object<moduleId : importInfo>,
-  export: exportInfo,
-  dynamicImport: Array<String>
-} = analyze({
+```ts
+async analyze({
   ast,
-  subtree?: Boolean
-});
+  subtree?: boolean
+}) => {
+  import: {
+    [importee]: {
+      default: boolean,
+      named: Array<string>,
+      all: boolean,
+      used: Array<string>
+    }
+  }
+  export: {
+    default: boolean,
+    named: Array<string>,
+    all: boolean
+  },
+  dynamicImport: Array<string>
+}
 ```
 
 #### options
 
-`ast` is an estree object.
+* `ast` is an estree object.
+* `subtree` - if `true`, the analyzer will analyze the entire tree, otherwise only those top-level nodes (import/export declarations) are analyzed. **You have to set `subtree` to `true` if you want to collect the usage of imported names and to collect dynamic imports**. Default: `false`.
 
-If `subtree` is `true`, the analyzer will analyze the entire tree, otherwise only the top nodes (import/export declarations) are analyzed. **You have to set `subtree` to `true` if you want to collect the usage of imported names and to collect dynamic imports**. Default: `false`.
+#### result.import
 
-#### analyzeResult
+* `result.import` is an `importee` -> `importInfo` object map.
+* `result.import[importee].default` - if true then the default member is imported from the `importee` module.
+* `result.import[importee].named` contains a list of imported names.
+* `result.import[importee].all` - if true then all names are imported from the module i.e. `import * from ...`.
+* `result.import[importee].used` is an array of imported names. If a name is included in this array, then it is referenced somewhere in the code. You can use this array to determine which names are actually used when `.all` is true.
 
-`import` is an object map. The key is the module ID and the value is an information object with these properties:
+  Note that `export {foo} from "bar"` doesn't *use* `foo`.
 
-```js
-const importInfo = {
-  default: Boolean,
-  named: Array<String>,
-  all: Boolean,
-  used: Array<String>
-};
-```
+#### result.export
 
-If `importInfo.default` is true then the default member is imported from the module.
+* `result.export.default` - if true then the module exports a default member.
+* `result.export.named` is a list of exported names.
+* `result.export.all` - if true then the module exports all members from another module e.g. `export * from "foo"`.
 
-`importInfo.named` contains a list of imported names.
+#### result.dynamicImport
 
-If `importInfo.all` is true then all names are imported from the module (`import * from ...`).
-
-`importInfo.used` is an array of imported names. If a name is included in this array, then it is referenced somewhere in the code. You can use this array to determine which names are actually used when `importInfo.all` is true.
-
-Note that `export {foo} from "bar"` doesn't *use* `foo`.
-
-`exportInfo` has following properties:
-
-```js
-const exportInfo = {
-  default: Boolean,
-  named: Array<String>,
-  all: Boolean
-};
-```
-
-If `exportInfo.default` is true then the module exports a default member.
-
-`exportInfo.named` is a list of exported names.
-
-If `exportInfo.all` is true then the module exports all members from another module e.g. `export * from "foo"`.
-
-`dynamicImport` is a list of module ID which are imported with dynamic `import()` statement.
+* `dynamicImport` is a list of module ID which are imported with dynamic `import()` statement.
 
 Changelog
 ---------
+
+* 0.4.0 (Aug 8, 2022)
+
+  - Bump dependencies.
+  - **Change: `analyze` is now an async function.**
+  - Fix: support `ImportExpression`.
 
 * 0.3.0 (Jun 13, 2019)
 
