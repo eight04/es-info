@@ -1,6 +1,5 @@
-const {walk} = require("estree-walker");
-const {attachScopes} = require("rollup-pluginutils");
-const isReference = require("is-reference");
+/* eslint-env node */
+const {attachScopes} = require("@rollup/pluginutils");
 
 class ParseError extends Error {
   constructor(message, node) {
@@ -9,7 +8,11 @@ class ParseError extends Error {
   }
 }
 
-function analyze({ast, subtree = false}) {
+async function analyze({ast, subtree = false}) {
+  const [{walk}, {default: isReference}] = await Promise.all([
+    import("estree-walker"),
+    import("is-reference")
+  ]);
   const result = {
     import: {},
     export: {
@@ -25,7 +28,7 @@ function analyze({ast, subtree = false}) {
   }
   
   const importRefs = new Map;
-  
+
   walk(ast, {
     enter: analyzeNode
   });
@@ -108,9 +111,13 @@ function analyze({ast, subtree = false}) {
       const imported = getImported(node.source.value);
       imported.all = true;
     } else if (node.type === "CallExpression") {
+      // old dynamic import
       if (node.callee.type === "Import") {
         result.dynamicImport.push(node.arguments[0].value);
       }
+    } else if (node.type === "ImportExpression") {
+      // new dynamic import
+      result.dynamicImport.push(node.source.value);
     } else if (node.type === "Identifier" && isReference(node, parent) && node._esInfoScope) {
       if (!node._esInfoScope.contains(node.name) && importRefs.has(node.name)) {
         let {id, name} = importRefs.get(node.name);
